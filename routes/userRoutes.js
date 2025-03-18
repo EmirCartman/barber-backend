@@ -9,6 +9,10 @@ const router = express.Router();
 router.post("/register", async (req, res) => {
   const { name, email, password, role } = req.body;
 
+  if (!name || !email || !password || !role) {
+    return res.status(400).json({ message: "Lütfen tüm alanları doldurun." });
+  }
+
   try {
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: "Bu e-posta zaten kayıtlı" });
@@ -25,9 +29,13 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Kullanıcı girişi
+// Kullanıcı girişi (login)
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "Lütfen tüm alanları doldurun." });
+  }
 
   try {
     const user = await User.findOne({ email });
@@ -40,7 +48,11 @@ router.post("/login", async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+    res.json({
+      message: "Giriş başarılı!",
+      token,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
+    });
   } catch (error) {
     res.status(500).json({ message: "Sunucu hatası" });
   }
