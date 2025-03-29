@@ -2,16 +2,27 @@ const Barber = require("../models/Barber");
 
 // Berber oluşturma
 const ekleBerber = async (req, res) => {
-  const { services } = req.body;
+  const { name, location, services } = req.body;
+
+  // Eksik alan kontrolü
+  if (!name || !location || !services) {
+    return res.status(400).json({ message: "Lütfen name, location ve services bilgilerini eksiksiz gönderin." });
+  }
 
   try {
-    const barber = new Barber({ user: req.user.id, services });
+    console.log("Gelen veriler:", req.body);
+
+    const barber = new Barber({ user: req.user.id, name, location, services });
     await barber.save();
+
     res.status(201).json(barber);
   } catch (error) {
-    res.status(500).json({ message: "Berber oluşturulurken hata oluştu." });
+    console.error("Berber oluşturma hatası:", error);
+    res.status(500).json({ message: "Berber oluşturulurken hata oluştu.", error: error.message });
   }
 };
+
+
 
 // Tüm berberleri listeleme
 const listeleBerberler = async (req, res) => {
@@ -28,11 +39,13 @@ const getirBerber = async (req, res) => {
   try {
     const barber = await Barber.findById(req.params.id).populate("user", "name email");
     if (!barber) return res.status(404).json({ message: "Berber bulunamadı" });
-
+    
     res.json(barber);
   } catch (error) {
-    res.status(500).json({ message: "Profil getirilemedi." });
+    console.error("Hata Detayı:", error); // Gerçek hata mesajını göster
+    res.status(500).json({ message: "Profil getirilemedi.", error: error.message });
   }
 };
+
 
 module.exports = { ekleBerber, listeleBerberler, getirBerber };

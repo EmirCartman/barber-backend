@@ -10,6 +10,7 @@ const User = require('./models/User');  // Kullanıcı modelini import ediyoruz
 
 
 
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -100,3 +101,6 @@ app.post('/api/login', async (req, res) => {
   // Kullanıcıya token gönder
   res.status(200).json({ message: 'Giriş başarılı', token });
 });
+
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/api/admin', adminRoutes);
